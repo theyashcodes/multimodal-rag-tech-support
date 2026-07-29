@@ -3,7 +3,7 @@ import axios from "axios";
 import "./App.css";
 
 // var API = `${process.env.REACT_APP_BACKEND_URL}/api`;
-var API = "http://localhost:8001/api" // hardcoded this because env was not working for me lol
+var API = "https://multimodal-rag-tech-support.onrender.com/api" // using the live backend url
 
 function App() {
   // state for pdf stuff
