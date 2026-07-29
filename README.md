@@ -1,55 +1,174 @@
 # Multi-modal RAG for Technical Support
 
-A simple web app that:
-- Reads a PDF technical manual
-- Looks at product images
-- Answers troubleshooting questions using retrieved manual context + image understanding
+An AI-powered technical support assistant that combines **Retrieval-Augmented Generation (RAG)** with **Google Gemini** to answer troubleshooting queries using both **PDF manuals** and **product images**.
 
-## Modules
+## Overview
 
-### Backend (`backend/`)
+This application allows users to:
 
-- **`pdf_loader.py`** – opens the PDF with PyMuPDF, extracts all text, and splits it into overlapping word chunks.
-- **`embeddings.py`** – wraps `sentence-transformers` (`all-MiniLM-L6-v2`) to turn text into vectors.
-- **`vector_store.py`** – builds / loads a FAISS inner-product index on disk (`vector_store/`) and does top-k search.
-- **`image_processor.py`** – saves uploaded images to `uploads/` and loads them as PIL images.
-- **`gemini.py`** – calls Google Gemini with a prompt and optional images.
-- **`rag.py`** – ties it all together: index a PDF, retrieve chunks for a query, and ask Gemini with retrieved chunks + images.
-- **`server.py`** – FastAPI endpoints (`/api/upload-pdf`, `/api/upload-image`, `/api/ask`, `/api/reset`, `/api/status`).
+- Upload a product's technical manual (PDF)
+- Upload one or more product images
+- Ask troubleshooting questions in natural language
+- Receive context-aware answers generated from the manual and image analysis
 
-### Frontend (`frontend/`)
+The system retrieves the most relevant sections from the uploaded manual using vector search and combines them with image understanding to generate accurate responses.
 
-React app with a dark UI. One page with three parts:
-1. Upload PDF (indexes it)
-2. Upload product images (keeps previews)
-3. Chat panel — ask a question, get an answer with expandable source chunks
+---
 
-Chat history lives only in browser state (session-only, resets on reload).
+## Features
 
-## Setup (local)
+- PDF manual upload and indexing
+- Product image upload with preview
+- Semantic search using FAISS
+- Google Gemini Vision + Text integration
+- Context-aware troubleshooting responses
+- Responsive React interface
+- FastAPI REST backend
+- Session-based chat history
+- Reset functionality
+
+---
+
+## Tech Stack
+
+### Frontend
+
+- React
+- JavaScript
+- CSS
+
+### Backend
+
+- Python
+- FastAPI
+
+### AI
+
+- Google Gemini API
+- Gemini Embedding API
+
+### Vector Search
+
+- FAISS
+
+### PDF Processing
+
+- PyMuPDF
+
+---
+
+## Project Structure
+
+```
+backend/
+    server.py
+    rag.py
+    pdf_loader.py
+    embeddings.py
+    vector_store.py
+    gemini.py
+    image_processor.py
+
+frontend/
+    React application
+
+manuals/
+uploads/
+vector_store/
+```
+
+---
+
+## Workflow
+
+```
+Upload PDF
+      │
+      ▼
+Extract Text
+      │
+      ▼
+Split into Chunks
+      │
+      ▼
+Generate Embeddings
+      │
+      ▼
+Store in FAISS
+      │
+      ▼
+User Question + Product Image
+      │
+      ▼
+Retrieve Relevant Chunks
+      │
+      ▼
+Gemini
+      │
+      ▼
+Generate Final Answer
+```
+
+---
+
+## Local Setup
 
 ### Backend
 
 ```bash
 cd backend
+
 pip install -r requirements.txt
-# add your key to backend/.env
-# GEMINI_API_KEY=your_key_here
-uvicorn server:app --host 0.0.0.0 --port 8001 --reload
+
+uvicorn server:app --reload
+```
+
+Create a `.env` file:
+
+```env
+GEMINI_API_KEY=YOUR_API_KEY
 ```
 
 ### Frontend
 
 ```bash
 cd frontend
+
 yarn install
 yarn start
 ```
 
-Set `REACT_APP_BACKEND_URL` in `frontend/.env` to point at the backend.
+Update the backend URL inside:
 
-## Notes
+```
+frontend/.env
+```
 
-- The FAISS index and chunks live under `vector_store/`. Uploading a new PDF replaces the index.
-- Uploaded images live under `uploads/`. Manual PDFs live under `manuals/`.
-- Uses `gemini-flash-latest` for both vision and text.
+---
+
+## API Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `/api/upload-pdf` | Upload and index PDF |
+| `/api/upload-image` | Upload product image |
+| `/api/ask` | Ask troubleshooting question |
+| `/api/reset` | Reset current session |
+| `/api/status` | Check backend status |
+
+---
+
+## Future Improvements
+
+- Support multiple manuals
+- OCR support for scanned PDFs
+- Conversation memory
+- User authentication
+- Cloud vector database
+- Multi-language support
+
+---
+
+## License
+
+This project is intended for educational purposes.
