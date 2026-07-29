@@ -112,7 +112,7 @@ def get_status():
 
 @api.post("/upload-pdf")
 async def do_pdf_upload(file: UploadFile = File(...)):
-    # print("uploading pdf...")
+    print("uploading pdf started...", flush=True)
     filename = file.filename.lower()
     if filename.endswith(".pdf") == False:
         raise HTTPException(400, "bro its not a pdf")
@@ -123,14 +123,19 @@ async def do_pdf_upload(file: UploadFile = File(...)):
     f.close()
     
     try:
+        print("reading pdf file...", flush=True)
         t = read_pdf_file(new_path)
+        print("making chunks...", flush=True)
         c = make_chunks(t)
         if len(c) == 0:
             raise Exception("no text found")
+        print("getting embeddings (this might take time)...", flush=True)
         v = get_embeds(c)
+        print("making faiss index...", flush=True)
         vector_store.make_the_index(v, c)
+        print("pdf upload complete!", flush=True)
     except Exception as error_msg:
-        print("ERROR IN PDF:", error_msg)
+        print("ERROR IN PDF:", error_msg, flush=True)
         raise HTTPException(500, "Failed to do it: " + str(error_msg))
     
     return {"filename": file.filename, "chunks": len(c)}
@@ -209,7 +214,7 @@ except:
     
 app.add_middleware(
     CORSMiddleware,
-    allow_credentials=True,
+    allow_credentials=False,
     allow_origins=origins,
     allow_methods=["*"],
     allow_headers=["*"],
