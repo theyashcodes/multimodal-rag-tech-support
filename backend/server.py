@@ -11,7 +11,7 @@ import io
 from PIL import Image
 from google import genai
 from google.genai import types
-from sentence_transformers import SentenceTransformer
+
 
 import vector_store # using my own file for vectors
 
@@ -35,6 +35,7 @@ my_model = None
 def get_embedding_model():
     global my_model
     if my_model == None:
+        from sentence_transformers import SentenceTransformer
         my_model = SentenceTransformer("all-MiniLM-L6-v2")
     return my_model
 
