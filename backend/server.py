@@ -39,7 +39,7 @@ def get_embeds(text_list):
         raise Exception("No Gemini API key found for embeddings!")
     
     # call gemini API for embeddings
-    ans = gem_client.models.embed_content(model="text-embedding-004", contents=text_list)
+    ans = gem_client.models.embed_content(model="gemini-embedding-2", contents=text_list)
     
     vecs = []
     for e in ans.embeddings:
