@@ -31,18 +31,21 @@ app = FastAPI()
 api = APIRouter(prefix="/api")
 
 # AI MODELS
-my_model = None
-def get_embedding_model():
-    global my_model
-    if my_model == None:
-        from sentence_transformers import SentenceTransformer
-        my_model = SentenceTransformer("all-MiniLM-L6-v2")
-    return my_model
+import numpy as np
 
 def get_embeds(text_list):
-    mod = get_embedding_model()
-    # converting to numpy so it works
-    return mod.encode(text_list, convert_to_numpy=True, normalize_embeddings=True)
+    # Instead of heavy PyTorch model, we use Gemini API so it runs fast on free tier!
+    if gem_client == None:
+        raise Exception("No Gemini API key found for embeddings!")
+    
+    # call gemini API for embeddings
+    ans = gem_client.models.embed_content(model="text-embedding-004", contents=text_list)
+    
+    vecs = []
+    for e in ans.embeddings:
+        vecs.append(e.values)
+        
+    return np.array(vecs).astype("float32")
 
 # gemini client setup
 key = os.environ.get("GEMINI_API_KEY")
